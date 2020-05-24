@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- 页面meta -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>角色管理</title>
+        <meta name="description" content="角色管理">
+        <meta name="keywords" content="角色管理">
+        <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" name="viewport">
+        <!-- 引入样式 -->
+        <!--<link rel="stylesheet" href="../plugins/bootstrap/css/bootstrap.min.css">-->
+        <link rel="stylesheet" href="../plugins/elementui/index.css">
+        <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="../css/style.css">
+        <link rel="stylesheet" href="../css/orderset.css">
+        <!--<link rel="stylesheet" href="../plugins/adminLTE/css/AdminLTE.css">
+        <link rel="stylesheet" href="../plugins/adminLTE/css/skins/_all-skins.min.css">-->
+        <!-- 引入组件库 -->
+        <script src="../js/vue.js"></script>
+        <script src="../plugins/elementui/index.js"></script>
+        <script type="text/javascript" src="../js/jquery.min.js"></script>
+        <script src="../js/axios-0.18.0.js"></script>
+    </head>
+    <body class="hold-transition">
+    <div id="app">
+        <div class="content-header">
+            <h3 class="box-title">角色管理</h3>
+        </div>
+        <div class="app-container" style="height: 90%">
+            <div class="box">
+                <div class="box ordersetting"style="width: auto">
+                    <el-card class="box-card">
+                        <el-row>
+                            <el-button type="primary" @click="entity={};dialogFormVisible = true">新增角色</el-button>
+                            <el-button type="danger" @click="dele()">删除角色</el-button>
+                            <el-button type="info" onclick="window.location.reload();">刷新</el-button>
+                        </el-row>
+                    </el-card>
+                    <el-card class="box-card">
+                        <template style="width: auto">
+                        <el-row :gutter="20">
+                            <el-col :span="6" :offset="2">
+                                <el-card class="box-card">
+                                    <div slot="header" class="clearfix">
+                                        <span>角色列表</span>
+                                    </div>
+                                    <el-table
+                                            ref="multipleTable"
+                                            :data="list"
+                                            border
+                                            stripe
+                                            tooltip-effect="dark"
+                                            style="width: 100%"
+                                            @selection-change="handleSelectionChange">
+                                        <el-table-column
+                                                type="selection"
+                                                width="70"
+                                                align="center">
+                                        </el-table-column>
+                                        <el-table-column
+                                                prop="id"
+                                                label="ID"
+                                                width="100"
+                                                align="center">
+                                        </el-table-column>
+                                        <el-table-column
+                                                prop="name"
+                                                label="角色"
+                                                width="150"
+                                                align="center">
+                                        </el-table-column>
+                                        <el-table-column
+                                                prop="description"
+                                                label="描述"
+                                                width="120"
+                                                align="center">
+                                        </el-table-column>
+                                        <el-table-column label="操作"
+                                                         align="center">
+                                            <template slot-scope="scope">
+                                                <!--<el-button
+                                                        size="mini"
+                                                        data-toggle="modal" data-target="#editModal" @click="findOne(entity.id)">编辑</el-button>-->
+                                                <el-button size="mini" type="primary" @click="findOne(scope.row.id);dialogFormVisible = true">编辑</el-button>
+                                                <el-dialog title="用户编辑" :visible.sync="dialogFormVisible">
+                                                    <el-form :model="entity">
+                                                        <el-form-item label="品牌名称" :label-width="formLabelWidth">
+                                                            <el-input placeholder="品牌名称" v-model="entity.name" autocomplete="off"></el-input>
+                                                        </el-form-item>
+                                                        <el-form-item label="首字母" :label-width="formLabelWidth">
+                                                            <el-input placeholder="首字母" v-model="entity.firstChar" autocomplete="off"></el-input>
+                                                        </el-form-item>
+                                                    </el-form>
+                                                    <div slot="footer" class="dialog-footer">
+                                                        <el-button @click="dialogFormVisible = false">取 消</el-button>
+                                                        <el-button type="primary" @click="save();dialogFormVisible=false">保 存</el-button>
+                                                    </div>
+                                                </el-dialog>
+                                            </template>
+                                        </el-table-column>
+                                    </el-table>
+                                </el-card>
+
+                            </el-col>
+                            <el-col :span="6" :offset="1">
+                                <el-card class="box-card">
+                                    <div slot="header" class="clearfix">
+                                        <span>角色菜单管理</span>
+                                    </div>
+                                    <el-tree
+                                            :data="menuData"
+                                            show-checkbox
+                                            default-expand-all
+                                            node-key="id"
+                                            :props="defaultProps">
+                                    </el-tree>
+                                </el-card>
+                            </el-col>
+                            <el-col :span="6" :offset="1">
+                                <el-card class="box-card">
+                                    <div slot="header" class="clearfix">
+                                        <span>角色权限管理</span>
+                                    </div>
+                                    <el-tree
+                                            :data="menuData"
+                                            show-checkbox
+                                            default-expand-all
+                                            node-key="id"
+                                            :props="defaultProps">
+                                    </el-tree>
+                                </el-card>
+                            </el-col>
+                        </el-row>
+
+                    </template><br>
+                    </el-card>
+                    <!--<hr>
+                    <div style="text-align: center">
+                        <template>
+                            &lt;!&ndash;<navigation :pages="pages" :current.sync="pageNo"  @navpage="searchList"></navigation>&ndash;&gt;
+                            <el-pagination
+                                    background
+                                    layout="prev, pager, next"
+                                    :current-page.sync="pageNo"
+                                    @current-change="searchList"
+                                    :page-count="pages">
+                            </el-pagination>
+                        </template>
+                    </div>-->
+                </div>
+            </div>
+
+        </div>
+        <!-- 数据表格 -->
+
+    </div>
+    </body>
+    <!-- 引入组件库 -->
+    <script src="../js/vue.js"></script>
+    <script src="../js/axios-0.18.0.js"></script>
+    <script src="../plugins/elementui/index.js"></script>
+    <script src="../js/pagination.js"></script>
+    <script src="../js/controller/roleController.js"></script>
+</html>

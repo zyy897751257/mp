@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- 页面meta -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>管理平台</title>
+        <meta name="description" content="管理平台">
+        <meta name="keywords" content="管理平台">
+        <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" name="viewport">
+        <!-- 引入样式 -->
+        <link rel="stylesheet" href="plugins/elementui/index.css">
+        <link rel="stylesheet" href="css/login.css">
+    </head>
+    <body class="hold-transition skin-purple sidebar-mini">
+        <div id="app">
+            <div class="login-container">
+                <div class="loginBox">
+                    <el-form :model="userForm"
+                             :rules="rules" ref="userForm"
+                             label-position="left"
+                             label-width="0px"
+                             class="demo-ruleForm">
+                        <h3 class="title" align="center">系统登录</h3>
+                        <el-form-item prop="username">
+                            <el-input type="text"
+                                      v-model="userForm.username"
+                                      placeholder="用户名"
+                            ></el-input>
+                        </el-form-item>
+                        <el-form-item prop="password">
+                            <el-input type="password"
+                                      v-model="userForm.password"
+                                      placeholder="密码"
+                            ></el-input>
+                        </el-form-item>
+                        <el-form-item style="width:100%;">
+                            <el-button type="primary" style="width:100%;" @click="login()" :loading="ifWait">登录</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+              </div>
+        </div>
+    </body>
+    <!-- 引入组件库 -->
+    <script src="js/vue.js"></script>
+    <script src="js/axios-0.18.0.js"></script>
+    <script src="plugins/elementui/index.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data:{
+                userForm:{
+                    username: '',
+                    password: ''
+                },
+                rules: {
+                    username: [
+                        { required: true, message: '用户名不能为空', trigger: 'blur' },
+                    ],
+                    password: [
+                        { required: true, message: '密码不能为空', trigger: 'blur' }
+                    ],
+                },
+                ifWait: false
+            },
+            methods:{
+                login() {
+                    this.$refs['userForm'].validate((valid) => {
+                        if (valid) {
+                            var formData=new FormData();
+                            formData.append('username',this.userForm.username);
+                            formData.append('password',this.userForm.password);
+                            axios.post("/login",formData).then(function (response) {
+                                if (response.data.flag) {
+                                    window.location.href ="pages/main.html"
+                                } else {
+                                    app.userForm = {}
+                                    app.open(response.data.message)
+                                }
+                            })
+                        } else {
+                            console.log('error submit!!');
+                            return false;
+                        }
+                    });
+
+                },
+                open(message) {
+                    this.$confirm(message, '提示', {
+                        confirmButtonText: '确定'
+                    });
+                }
+            },
+            // 在初始化数据之前执行
+            created:function () {
+                /*axios.get("/user/getUsername.do").then((response)=>{
+                    this.username = response.data.data;
+                }).catch((error)=>{
+
+                })*/
+                var _this = this;
+                document.onkeydown = function(e) {
+                    let key = window.event.keyCode;
+                    if (key == 13) {
+                        _this.login();
+                    }
+                };
+            }
+        });
+    </script>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- 页面meta -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>医疗机构管理</title>
+        <meta name="description" content="医疗机构管理">
+        <meta name="keywords" content="医疗机构管理">
+        <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" name="viewport">
+        <!-- 引入样式 -->
+        <!--<link rel="stylesheet" href="../plugins/bootstrap/css/bootstrap.min.css">-->
+        <link rel="stylesheet" href="../plugins/elementui/index.css">
+        <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="../css/style.css">
+        <link rel="stylesheet" href="../css/orderset.css">
+        <!--<link rel="stylesheet" href="../plugins/adminLTE/css/AdminLTE.css">
+        <link rel="stylesheet" href="../plugins/adminLTE/css/skins/_all-skins.min.css">-->
+        <!-- 引入组件库 -->
+        <script src="../js/vue.js"></script>
+        <script src="../plugins/elementui/index.js"></script>
+        <script type="text/javascript" src="../js/jquery.min.js"></script>
+        <script src="../js/axios-0.18.0.js"></script>
+    </head>
+    <body class="hold-transition">
+    <div id="app">
+        <div class="content-header">
+            <h3 class="box-title">医疗机构</h3>
+        </div>
+        <div class="app-container">
+            <div class="box">
+                <div style="width: auto">
+                    <el-card class="box-card">
+                        <el-row>
+                            <el-button type="primary" @click="orgForm={};dialogFormVisible = true">新增机构</el-button>
+                            <el-button type="warning" @click="findOne(orgEntity.orgCode);dialogFormVisible = true;ifUpdate = true">修改信息</el-button>
+                        </el-row>
+                    </el-card>
+                    <el-card class="box-card">
+                        <template style="width: auto">
+                            <el-form :model="orgEntity" label-width="100px" >
+                                <el-form-item label="机构代码">
+                                    <el-input v-model="orgEntity.orgCode" readonly></el-input>
+                                </el-form-item>
+                                <el-form-item label="机构名称">
+                                    <el-input v-model="orgEntity.orgName" readonly></el-input>
+                                </el-form-item>
+                                <el-form-item label="机构级别">
+                                    <el-select v-model="orgEntity.orgLevel" placeholder="请选择机构级别">
+                                        <el-option label="一级" value="1"></el-option>
+                                        <el-option label="二级" value="2"></el-option>
+                                        <el-option label="三级" value="3"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="机构电话">
+                                    <el-input v-model="orgEntity.telephone" readonly></el-input>
+                                </el-form-item>
+                                <el-form-item label="机构地址">
+                                    <el-input v-model="orgEntity.orgAddress" readonly></el-input>
+                                </el-form-item>
+                                <el-form-item label="机构负责人">
+                                    <el-input v-model="orgEntity.principal" readonly></el-input>
+                                </el-form-item>
+                                <el-form-item label="机构状态">
+                                    <el-switch
+                                            v-model="orgEntity.orgStatus"
+                                            active-color="#13ce66"
+                                            active-text="启用"
+                                            inactive-text="禁用"
+                                            active-value='1'
+                                            inactive-value='0'
+                                            disabled>
+                                    </el-switch>
+                                </el-form-item>
+                            </el-form>
+                        </template><br>
+                        <hr>
+                    </el-card>
+                </div>
+            </div>
+
+        </div>
+        <!-- 数据表格 -->
+        <el-dialog :title="ifUpdate != true?'新增医疗机构':'修改机构信息'" :visible.sync="dialogFormVisible">
+            <el-form :model="orgForm" :rule="rules" ref="orgForm" label-width="100px"  class="demo-ruleForm">
+                <el-form-item label="机构代码" prop="orgCode">
+                    <el-input v-model="orgForm.orgCode"></el-input>
+                </el-form-item>
+                <el-form-item label="机构名称" prop="orgName">
+                    <el-input v-model="orgForm.orgName"></el-input>
+                </el-form-item>
+                <el-form-item label="机构级别" prop="orgLevel">
+                    <el-select v-model="orgForm.orgLevel" placeholder="请选择机构级别">
+                        <el-option label="一级" value="1"></el-option>
+                        <el-option label="二级" value="2"></el-option>
+                        <el-option label="三级" value="3"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="机构电话" prop="telephone">
+                    <el-input v-model="orgForm.telephone"></el-input>
+                </el-form-item>
+                <el-form-item label="机构地址" prop="orgAddress">
+                    <el-input v-model="orgForm.orgAddress"></el-input>
+                </el-form-item>
+                <el-form-item label="机构负责人" prop="principal">
+                    <el-input v-model="orgForm.principal"></el-input>
+                </el-form-item>
+                <el-form-item label="机构状态" prop="orgStatus">
+                    <el-switch
+                            v-model="orgForm.orgStatus"
+                            active-color="#13ce66"
+                            active-text="启用"
+                            inactive-text="禁用"
+                            active-value='1'
+                            inactive-value='0'>
+                    </el-switch>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false;ifUpdate = false">取 消</el-button>
+                <el-button type="primary" @click="save();dialogFormVisible=false;ifUpdate = false">保 存</el-button>
+            </div>
+        </el-dialog>
+
+    </div>
+    </body>
+    <!-- 引入组件库 -->
+    <script src="../js/vue.js"></script>
+    <script src="../js/axios-0.18.0.js"></script>
+    <script src="../js/controller/base.js"></script>
+    <script src="../plugins/elementui/index.js"></script>
+    <script src="../js/pagination.js"></script>
+    <script src="../js/controller/orgController.js"></script>
+</html>
